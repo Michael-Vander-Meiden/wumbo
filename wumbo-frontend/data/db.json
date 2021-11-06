@@ -1,0 +1,28 @@
+{
+    "pairs": [
+      {
+        "title": "USDC-USDT",
+        "collateral": "USDC",
+        "debt": "USDT",
+        "id": 1
+      },
+      {
+        "title": "USDC-USDT",
+        "collateral": "USDC",
+        "debt": "USDT",
+        "id": 2
+      },
+      {
+        "title": "USDC-USDT",
+        "collateral": "USDC",
+        "debt": "USDT",
+        "id": 3
+      },
+      {
+        "title": "USDC-USDT",
+        "collateral": "USDC",
+        "debt": "USDT",
+        "id": 4
+      }
+    ]
+  }
