@@ -99,6 +99,8 @@ class App extends Component {
             userUsdcBalance,
             traderDaiBalance,
             traderUSDCBalance,
+            daiContract,
+            usdcContract,
             
         })
     }
@@ -153,6 +155,62 @@ class App extends Component {
             .on('receipt', async () => {
                 this.setState({
                     traderAdmin: await traderContract.methods.viewAdmin().call()
+                })
+            })
+    }
+
+    depositDAI = async (e) => {
+        const {accounts, daiContract, traderContract} = this.state
+        e.preventDefault()
+
+        await daiContract.methods.transfer(traderContract._address, 100).send({from: accounts[0]})
+            .on('receipt', async () => {
+                this.setState({
+                    userDaiBalance: await daiContract.methods.balanceOf(this.state.accounts[0]).call(),
+                    traderDaiBalance: await traderContract.methods.daiBalance().call()
+
+                })
+            })
+    }
+
+    depositUSDC = async (e) => {
+        const {accounts, usdcContract, traderContract} = this.state
+        e.preventDefault()
+
+        await usdcContract.methods.transfer(traderContract._address, 100).send({from: accounts[0]})
+            .on('receipt', async () => {
+                this.setState({
+                    userUsdcBalance: await usdcContract.methods.balanceOf(this.state.accounts[0]).call(),
+                    traderUSDCBalance: await traderContract.methods.usdcBalance().call()
+
+                })
+            })
+    }
+
+    withdrawDAI = async (e) => {
+        const {accounts, daiContract, traderContract} = this.state
+        e.preventDefault()
+
+        await traderContract.methods.withdrawDai().send({from: accounts[0]})
+            .on('receipt', async () => {
+                this.setState({
+                    userDaiBalance: await daiContract.methods.balanceOf(this.state.accounts[0]).call(),
+                    traderDaiBalance: await traderContract.methods.daiBalance().call()
+
+                })
+            })
+    }
+
+    withdrawUSDC = async (e) => {
+        const {accounts, usdcContract, traderContract} = this.state
+        e.preventDefault()
+
+        await traderContract.methods.withdrawUsdc().send({from: accounts[0]})
+            .on('receipt', async () => {
+                this.setState({
+                    userUsdcBalance: await usdcContract.methods.balanceOf(this.state.accounts[0]).call(),
+                    traderUSDCBalance: await traderContract.methods.usdcBalance().call()
+
                 })
             })
     }
@@ -212,6 +270,13 @@ class App extends Component {
             <div>trader admin: {traderAdmin}</div>
             <div>user dai balance: {userDaiBalance}</div>
             <div>user usdc balance: {userUsdcBalance}</div>
+            <div>trader dai balance: {traderDaiBalance}</div>
+            <div>trader usdc balance: {traderUSDCBalance}</div>
+            <button onClick={this.depositDAI}>Deposit DAI</button>
+            <button onClick={this.depositUSDC}>Deposit USDC</button>
+            <button onClick={this.withdrawDAI}>Withdraw DAI</button>
+            <button onClick={this.withdrawUSDC}>Withdraw USDC</button>
+
 
         <Home/>
         </div>)
