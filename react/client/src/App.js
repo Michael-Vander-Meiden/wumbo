@@ -15,6 +15,16 @@ class App extends Component {
         solidityStorage: null,
         solidityValue: 0,
         solidityInput: 0,
+        
+        traderContract: null,
+        traderAdmin: null,
+        traderDaiBalance: 0,
+        traderUSDCBalance: 0,
+
+        daiContract: null,
+        usdcContract: null,
+        userDaiBalance: 0,
+        userUsdcBalance: 0
     }
 
     componentDidMount = async () => {
@@ -63,16 +73,33 @@ class App extends Component {
         }
         console.log(_chainID)
         const solidityStorage = await this.loadContract(_chainID,"SolidityStorage")
+        const traderContract = await this.loadContract(_chainID,"Trader")
+        const daiContract = await this.loadContract(_chainID,"DAI")
+        const usdcContract = await this.loadContract(_chainID,"USDC")
 
-        if (!solidityStorage) {
+
+
+        if (!solidityStorage || !daiContract) {
             return
         }
 
         const solidityValue = await solidityStorage.methods.get().call()
+        const traderAdmin = await traderContract.methods.viewAdmin().call()
+        const userDaiBalance = await daiContract.methods.balanceOf(this.state.accounts[0]).call()
+        const userUsdcBalance = await usdcContract.methods.balanceOf(this.state.accounts[0]).call()
+        const traderDaiBalance = await traderContract.methods.daiBalance().call()
+        const traderUSDCBalance = await traderContract.methods.usdcBalance().call()
+
 
         this.setState({
             solidityStorage,
             solidityValue,
+            traderContract,
+            userDaiBalance,
+            userUsdcBalance,
+            traderDaiBalance,
+            traderUSDCBalance,
+            
         })
     }
 
@@ -118,10 +145,24 @@ class App extends Component {
             })
     }
 
+    setAdmin = async (e) => {
+        const {accounts, traderContract} = this.state
+        e.preventDefault()
+
+        await traderContract.methods.setAdmin().send({from: accounts[0]})
+            .on('receipt', async () => {
+                this.setState({
+                    traderAdmin: await traderContract.methods.viewAdmin().call()
+                })
+            })
+    }
+
     render() {
         const {
             web3, accounts, chainid,
-            solidityStorage, solidityValue, solidityInput
+            solidityStorage, solidityValue, solidityInput,
+            traderAdmin, traderDaiBalance, traderUSDCBalance,
+            userDaiBalance, userUsdcBalance
         } = this.state
 
         if (!web3) {
@@ -140,11 +181,7 @@ class App extends Component {
         const isAccountsUnlocked = accounts ? accounts.length > 0 : false
 
         return (<div className="App">
-            <h1>Your Brownie Mix is installed and ready.</h1>
-            <p>
-                If your contracts compiled and deployed successfully, you can see the current
-                storage values below.
-            </p>
+
             {
                 !isAccountsUnlocked ?
                     <p><strong>Connect with Metamask and refresh the page to
@@ -171,6 +208,11 @@ class App extends Component {
 
                 </div>
             </form>
+            <button onClick={this.setAdmin}>Set TradeContract Admin</button>
+            <div>trader admin: {traderAdmin}</div>
+            <div>user dai balance: {userDaiBalance}</div>
+            <div>user usdc balance: {userUsdcBalance}</div>
+
         <Home/>
         </div>)
     }
