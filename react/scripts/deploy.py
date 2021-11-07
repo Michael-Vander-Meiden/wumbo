@@ -1,4 +1,4 @@
-from brownie import SolidityStorage, DAI, USDC, Trader, accounts, network
+from brownie import SolidityStorage, DAI, USDC, Trader, UniswapRouter, accounts, network
 
 
 def main():
@@ -7,10 +7,15 @@ def main():
         # add these accounts to metamask by importing private key
         owner = accounts[0]
 
-        dai = DAI.deploy("DAI", "DAI", 18, 100, {'from': accounts[0]})
-        usdc = USDC.deploy("USDC", "USDC", 18, 100, {'from': accounts[0]})
+        dai = DAI.deploy("DAI", "DAI", 18, 200, {'from': accounts[0]})
+        usdc = USDC.deploy("USDC", "USDC", 18, 200, {'from': accounts[0]})
 
-        Trader.deploy(dai, usdc, {'from':accounts[0]})
+        router = UniswapRouter.deploy({'from': accounts[0]})
+
+        dai.transfer(router, 100)
+        usdc.transfer(router, 100)
+
+        Trader.deploy(dai, usdc, router, {'from':accounts[0]})
 
         SolidityStorage.deploy({'from':accounts[0]})
 
