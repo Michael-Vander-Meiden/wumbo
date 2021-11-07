@@ -214,6 +214,35 @@ class App extends Component {
                 })
             })
     }
+    swapToDai = async (e) => {
+        const {accounts,daiContract, usdcContract, traderContract} = this.state
+        e.preventDefault()
+
+        await traderContract.methods.swapERC20(usdcContract._address, daiContract._address).send({from: accounts[0]})
+            .on('receipt', async () => {
+                this.setState({
+                    traderUSDCBalance: await traderContract.methods.usdcBalance().call(),
+                    traderDaiBalance: await traderContract.methods.daiBalance().call()
+
+
+                })
+            })
+    }
+
+    swapToUsdc = async (e) => {
+        const {accounts,daiContract, usdcContract, traderContract} = this.state
+        e.preventDefault()
+
+        await traderContract.methods.swapERC20(daiContract._address, usdcContract._address).send({from: accounts[0]})
+            .on('receipt', async () => {
+                this.setState({
+                    traderUSDCBalance: await traderContract.methods.usdcBalance().call(),
+                    traderDaiBalance: await traderContract.methods.daiBalance().call()
+
+
+                })
+            })
+    }
 
     render() {
         const {
@@ -276,6 +305,9 @@ class App extends Component {
             <button onClick={this.depositUSDC}>Deposit USDC</button>
             <button onClick={this.withdrawDAI}>Withdraw DAI</button>
             <button onClick={this.withdrawUSDC}>Withdraw USDC</button>
+            <button onClick={this.swapToDai}>Swap USDC for Dai</button>
+            <button onClick={this.swapToUsdc}>Swap Dai for USDC</button>
+
 
 
         <Home/>
