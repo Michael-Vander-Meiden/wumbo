@@ -1,4 +1,7 @@
 
+import React, {Component} from "react";
+
+
 const PairList = ({pairs }) => {
 
     const handleClick = () => {
